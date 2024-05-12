@@ -3,6 +3,7 @@
 #include <math.h>
 #include <ctime>
 int coordinate[10] = {-2, -2, -3, 0, 0, 3, 3, 0, 2, -2};
+int score=0;
 int logWidth = 100;
 int logHeight = 100;
 int phyHeight = 800;
@@ -85,15 +86,17 @@ public:
     void startTimer() {
         glutTimerFunc(timerInterval, timerCallback, 0);
     }
-
     static void stopwatch() {
         char timeString[50];
+        char scoreString[50];
         int milliseconds = glutGet(GLUT_ELAPSED_TIME) % 1000;
         int seconds = (glutGet(GLUT_ELAPSED_TIME) / 1000) % 60;
         sprintf(timeString, "%02d.%03d", seconds, milliseconds);
         glColor3f(1.0f, 1.0f, 1.0f);
         Print::printSome(timeString, centerX - 3.5, centerY + 25);
-
+		// Convert score to string
+        sprintf(scoreString, "Score: %d", score);
+        Print::printSome(scoreString, centerX - 3.5, centerY - 25);
         glutPostRedisplay();
     }
 };
@@ -292,7 +295,7 @@ public:
 		Control_Player::start_control();
 		Control_Player::player_arrow();
 	    //if(key == 13)
-			Time::stopwatch();
+		Time::stopwatch();
 		glutSwapBuffers();   
 		glFlush();
 	}
