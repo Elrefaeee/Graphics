@@ -1,9 +1,14 @@
+/*Made by Youssef Tarek 20100326
+  Made by Seif Ahmed Mansour 20102592
+*/
 #include <GL/glut.h>
 #include <cstdio>
 #include <math.h>
 #include <ctime>
+#include <unistd.h>
 int coordinate[10] = {-2, -2, -3, 0, 0, 3, 3, 0, 2, -2};
 int score=0;
+bool stopwatchRunning = false;
 int logWidth = 100;
 int logHeight = 100;
 int phyHeight = 800;
@@ -86,11 +91,30 @@ public:
     void startTimer() {
         glutTimerFunc(timerInterval, timerCallback, 0);
     }
-    static void stopwatch() {
+    static void initial_watch() {
         char timeString[50];
-        char scoreString[50];
+        int seconds=0;
+		int milliseconds=0;
+        sprintf(timeString, "%02d.%03d", seconds, milliseconds);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        Print::printSome(timeString, centerX - 3.5, centerY + 25);
+        glutPostRedisplay();
+    }
+    static void initial_score(){
+    	char scoreString[50];
+    	// Convert score to string
+        sprintf(scoreString, "Score: %d", score);
+        Print::printSome(scoreString, centerX - 3.5, centerY - 25);
+        glutPostRedisplay();
+	}
+	//interaction
+	static void stopwatch(){
+		char timeString[50];
+		char scoreString[50];
+		
         int milliseconds = glutGet(GLUT_ELAPSED_TIME) % 1000;
-        int seconds = (glutGet(GLUT_ELAPSED_TIME) / 1000) % 60;
+        int seconds = (glutGet(GLUT_ELAPSED_TIME) / 1000);
+		
         sprintf(timeString, "%02d.%03d", seconds, milliseconds);
         glColor3f(1.0f, 1.0f, 1.0f);
         Print::printSome(timeString, centerX - 3.5, centerY + 25);
@@ -98,7 +122,7 @@ public:
         sprintf(scoreString, "Score: %d", score);
         Print::printSome(scoreString, centerX - 3.5, centerY - 25);
         glutPostRedisplay();
-    }
+	}
 };
 class Background{
 public:
@@ -194,14 +218,13 @@ public:
 class Control_Player{
 public:	
 	static void keyboard(unsigned char key, int x, int y) {
-	    //closing game key
-		if (key == 27) { //escape
-	        exit(0);
-	    }
-	    //if(key == 13){ //enter
-	    //	Time::stopwatch();
-	    //	glutSpecialFunc(specialKeyboard);
-		//}
+		if (key == 27) { // Escape key to exit the game
+            exit(0);
+        } 
+		else if (key == 13) { // Enter key to start stopwatch
+            stopwatchRunning = true;
+            glutSpecialFunc(specialKeyboard);
+        }
 	}
 	//control player
 	static void specialKeyboard(int key, int x, int y)
@@ -258,7 +281,6 @@ public:
 	}
 	static void start_control(){
 		glutKeyboardFunc(keyboard);
-		glutSpecialFunc(specialKeyboard);
 	}
 	//player animation
 	static void player_arrow(){
@@ -294,8 +316,12 @@ public:
 		//control	
 		Control_Player::start_control();
 		Control_Player::player_arrow();
-	    //if(key == 13)
-		Time::stopwatch();
+		Time::initial_score();
+    	if (stopwatchRunning)
+        	Time::stopwatch();
+        else{
+        	Time::initial_watch();
+		}
 		glutSwapBuffers();   
 		glFlush();
 	}
